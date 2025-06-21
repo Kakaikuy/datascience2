@@ -3,6 +3,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
@@ -101,7 +103,7 @@ prediction_proba = model.predict_proba(input_scaled)
 # -------------------------------
 # 4. Output Prediksi
 # -------------------------------
-st.subheader("📌 Hasil Prediksi")
+st.subheader("🖌️ Hasil Prediksi")
 status_map = {
     "Graduate": "🎓 Lulus",
     "Dropout": "⚠️ Dropout",
@@ -110,13 +112,59 @@ status_map = {
 label = prediction[0]
 st.write(f"**Status Mahasiswa yang Diprediksi:** {status_map.get(label, label)}")
 
-# Probabilitas Kelas
 st.subheader("🔍 Probabilitas Kelas")
 proba_df = pd.DataFrame(prediction_proba, columns=model.classes_)
 st.dataframe(proba_df.T.rename(columns={0: "Probabilitas"}))
 
 # -------------------------------
-# 5. Eksplorasi Dataset (Opsional)
+# 5. Visualisasi Tambahan: Analisis Multivariat
+# -------------------------------
+st.subheader("📈 Analisis Multivariat")
+
+# Drop NA untuk visualisasi
+df_clean = df.dropna(subset=["Curricular_units_1st_sem_grade", "Curricular_units_2nd_sem_grade", "Status"])
+
+# Boxplot Nilai Semester
+fig1, ax1 = plt.subplots()
+sns.boxplot(data=df_clean, x="Status", y="Curricular_units_1st_sem_grade", ax=ax1)
+ax1.set_title("Distribusi Nilai Semester 1")
+st.pyplot(fig1)
+
+fig2, ax2 = plt.subplots()
+sns.boxplot(data=df_clean, x="Status", y="Curricular_units_2nd_sem_grade", ax=ax2)
+ax2.set_title("Distribusi Nilai Semester 2")
+st.pyplot(fig2)
+
+# Barplot rata-rata unit lulus
+avg_units = df_clean.groupby("Status")[["Curricular_units_1st_sem_approved", "Curricular_units_2nd_sem_approved"]].mean().reset_index()
+fig3, ax3 = plt.subplots()
+avg_units.plot(kind='bar', x='Status', ax=ax3)
+ax3.set_ylabel("Rata-rata Unit Lulus")
+ax3.set_title("Unit Lulus Semester 1 & 2")
+st.pyplot(fig3)
+
+# Stacked bar tuition
+st.markdown("#### 💰 Distribusi Status Berdasarkan Pembayaran Biaya Kuliah")
+fee_status = pd.crosstab(df_clean["Tuition_fees_up_to_date"], df_clean["Status"], normalize="index")
+fig4, ax4 = plt.subplots()
+fee_status.plot(kind="bar", stacked=True, ax=ax4, colormap="Pastel1")
+ax4.set_title("Proporsi Status Berdasarkan Pembayaran")
+ax4.set_ylabel("Proporsi")
+ax4.legend(title="Status")
+st.pyplot(fig4)
+
+# Heatmap korelasi
+st.markdown("#### 🧠 Korelasi Fitur dengan Status")
+df_corr = df_clean.copy()
+df_corr["Status"] = df_corr["Status"].map({"Dropout": 0, "Enrolled": 1, "Graduate": 2})
+corr = df_corr.corr(numeric_only=True)
+fig5, ax5 = plt.subplots(figsize=(10, 6))
+sns.heatmap(corr[["Status"]].sort_values("Status", ascending=False), annot=True, cmap="coolwarm", ax=ax5)
+ax5.set_title("Korelasi Fitur dengan Status Mahasiswa")
+st.pyplot(fig5)
+
+# -------------------------------
+# 6. Eksplorasi Dataset
 # -------------------------------
 with st.expander("📊 Lihat Cuplikan Dataset"):
     st.dataframe(df.sample(10))

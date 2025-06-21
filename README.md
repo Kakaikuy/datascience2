@@ -33,8 +33,28 @@ https://drive.google.com/file/d/1fXxRxV11Oa7lqhWHRralQx5iXMNyDk5N/view?usp=shari
 - Dataset bersih dan delimiter diperbaiki: 
 https://drive.google.com/file/d/1kDE2zUzRWjqnP5pRK4l3yOJI_cTN-_Ua/view?usp=sharing
 
-**Setup environment:**  
-Library utama: `pandas`, `numpy`, `scikit-learn`, `streamlit`
+### Library Utama yang Digunakan
+- `pandas`, `numpy`, `scikit-learn`, `streamlit`
+
+---
+
+### Setup Environment
+
+Terdapat beberapa cara untuk menyiapkan lingkungan kerja proyek machine learning ini agar dapat dijalankan dengan lancar:
+
+#### 🔹 Setup Environment - Anaconda
+```bash
+conda create --name main-ds python=3.9
+conda activate main-ds
+pip install -r requirements.txt
+```
+### Setup Environment - Pipenv (Shell/Terminal)
+```bash
+pip install pipenv
+pipenv install
+pipenv shell
+pip install -r requirements.txt
+```
 
 ### Membuat dan Mengaktifkan Virtual Environment (venv)
 Buka terminal
@@ -147,31 +167,47 @@ https://prediksidrop.streamlit.app
 
 ## Conclusion
 
-Berdasarkan hasil analisis dan pemodelan, ditemukan bahwa mahasiswa dengan potensi dropout memiliki beberapa karakteristik utama, seperti:
+Berdasarkan hasil eksplorasi data dan modeling, ditemukan bahwa mahasiswa yang berpotensi mengalami **dropout** memiliki beberapa **karakteristik utama**, yaitu:
 
-- Jumlah mata kuliah yang disetujui (approved) di semester 1 dan 2 yang rendah
+- Memiliki **jumlah mata kuliah yang disetujui (approved)** pada semester 1 dan 2 yang relatif rendah.
+- Memiliki **nilai akademik semester 1 dan 2** yang cenderung di bawah rata-rata.
+- **Status pembayaran biaya kuliah** yang tidak lancar (Tuition_fees_up_to_date = 0).
+- Tidak menerima beasiswa (Scholarship_holder = 0).
+- Beberapa mahasiswa dropout juga memiliki status sebagai **debtor** (penunggak pembayaran).
 
-- Nilai akademik (grade) semester yang di bawah rata-rata
+Dari sisi modeling, model **Gradient Boosting** dan **Logistic Regression** menunjukkan performa prediksi tertinggi (akurasi 86–88%). Namun, **Extra Trees Classifier** memberikan **feature importance** paling informatif dalam mengidentifikasi faktor-faktor kunci terhadap status mahasiswa.
 
-- Status pembayaran biaya kuliah yang tidak tepat waktu (Tuition_fees_up_to_date = 0)
+Kelas **Dropout** dan **Graduate** dapat diprediksi dengan baik (average precision > 0.85), tetapi prediksi terhadap kelas **Enrolled** masih rendah akibat **ketimpangan distribusi kelas**.
 
-Temuan ini mengindikasikan bahwa faktor akademik (khususnya capaian studi di semester awal) serta aspek sosial-ekonomi (kemampuan membayar biaya pendidikan) merupakan indikator utama yang berkontribusi terhadap risiko dropout.
+Dengan mengintegrasikan sistem prediktif ini ke dalam sistem akademik, pihak kampus dapat:
 
-Model prediksi berbasis Extra Trees Classifier terbukti mampu mengklasifikasikan status mahasiswa secara cukup akurat dan mengungkap fitur-fitur kunci tersebut sebagai variabel paling berpengaruh.
+- Melakukan **intervensi dini** kepada mahasiswa dengan risiko tinggi dropout.
+- Menyusun **program bimbingan akademik** berbasis data.
+- Menyediakan **dukungan finansial atau kebijakan pembayaran** yang lebih fleksibel.
 
-Sistem prediktif ini dapat digunakan oleh pihak kampus sebagai alat bantu dalam pengambilan keputusan, khususnya untuk:
+Sistem ini dapat menjadi alat bantu penting dalam menurunkan angka dropout dan meningkatkan kualitas kelulusan secara berkelanjutan.
 
-- Melakukan intervensi lebih awal terhadap mahasiswa dengan performa akademik kurang baik
+---
 
-- Menyediakan perhatian atau kebijakan khusus bagi mahasiswa yang mengalami kesulitan finansial
+## Rekomendasi Action Items
 
-Dengan penerapan sistem ini secara tepat, Jaya Jaya Institut memiliki peluang besar untuk menurunkan tingkat dropout serta menjaga reputasi dan kualitas institusi secara berkelanjutan di mata publik dan lembaga akreditasi.
+1. **Intervensi Akademik Dini**
+   - Fokus pada mahasiswa dengan nilai rendah dan sedikit mata kuliah yang disetujui pada semester awal.
+   - Terapkan program remedial, bimbingan belajar, atau sistem alert akademik berbasis fitur: 
+     - `Curricular_units_1st_sem_approved`
+     - `Curricular_units_2nd_sem_approved`
+     - `Curricular_units_1st/2nd_sem_grade`
 
-### Rekomendasi Action Items (Optional)
+2. **Kebijakan Pembayaran Adaptif**
+   - Berdasarkan fitur `Tuition_fees_up_to_date`, mahasiswa yang tidak update pembayaran memiliki risiko tinggi untuk dropout.
+   - Kampus dapat mengembangkan skema pembayaran fleksibel seperti cicilan atau penundaan dengan sistem monitoring otomatis.
 
-1. Intervensi Akademik Dini
-Berdasarkan fitur seperti Curricular_units_1st/2nd_sem_approved dan Curricular_units_1st/2nd_sem_grade, terlihat bahwa mahasiswa yang memiliki capaian akademik rendah—baik dalam bentuk nilai maupun jumlah mata kuliah yang diselesaikan—berisiko tinggi mengalami dropout. Oleh karena itu, institusi disarankan untuk memberikan bimbingan tambahan berupa program remedial atau kelas pengganti bagi mahasiswa dengan nilai rendah atau tidak mengikuti evaluasi, khususnya di semester awal.
+3. **Penguatan Program Beasiswa**
+   - Mahasiswa yang tidak mendapatkan beasiswa (`Scholarship_holder = 0`) lebih rentan terhadap dropout.
+   - Tingkatkan sosialisasi dan akses program bantuan finansial kepada mahasiswa dengan performa akademik baik tetapi memiliki kendala ekonomi.
 
-2. Pendekatan Finansial yang Lebih Fleksibel
-Fitur Tuition_fees_up_to_date menunjukkan bahwa keterlambatan pembayaran biaya pendidikan berkontribusi terhadap risiko dropout. Untuk mengurangi dampak ini, kampus dapat menerapkan kebijakan pendekatan individual (case-by-case) terhadap mahasiswa yang mengalami kendala keuangan, misalnya melalui program cicilan, penjadwalan ulang pembayaran, atau bentuk keringanan lainnya yang bersifat manusiawi namun tetap terukur.
+4. **Pemetaan Risiko Dropout Secara Visual**
+   - Gunakan dashboard analitik untuk mengamati tren dropout secara instan dan menyeluruh, guna mendukung pengambilan keputusan cepat dan tepat.
+
+---
 
